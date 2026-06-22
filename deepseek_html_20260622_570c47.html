@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Aras Desi">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Aras Kargo Desi | Gökhan Bilga</title>
+    
+    <!-- PWA Manifest -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('data:application/javascript,self.addEventListener("fetch",e=>{})');
+            });
+        }
+    </script>
+
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --card: #141414;
+            --border: #2a2a2a;
+            --text: #e0e0e0;
+            --accent: #ff5c00;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            padding-bottom: calc(10px + var(--safe-bottom));
+        }
+
+        .container {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 18px 15px;
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid var(--border);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .logo {
+            font-size: 1.4em;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: 2px;
+        }
+
+        /* MİKROFON BAR */
+        .mic-bar {
+            background: #1a1a1a;
+            border: 2px solid #2a2a2a;
+            border-radius: 25px;
+            padding: 8px 15px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .mic-bar:active {
+            transform: scale(0.97);
+        }
+
+        .mic-bar.active {
+            border-color: #00c853;
+            box-shadow: 0 0 15px rgba(0,200,83,0.2);
+        }
+
+        .mic-bar.error {
+            border-color: #ff1744;
+        }
+
+        .mic-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #444;
+            flex-shrink: 0;
+        }
+
+        .mic-bar.active .mic-dot {
+            background: #00c853;
+            animation: dotPulse 0.8s infinite;
+        }
+
+        .mic-bar.error .mic-dot {
+            background: #ff1744;
+        }
+
+        @keyframes dotPulse {
+            0%,100% { box-shadow: 0 0 5px #00c853; }
+            50% { box-shadow: 0 0 15px #00c853; }
+        }
+
+        .mic-text {
+            flex: 1;
+            color: #888;
+            font-size: 0.7em;
+            font-weight: 500;
+        }
+
+        .mic-bar.active .mic-text {
+            color: #00c853;
+        }
+
+        .mic-icon {
+            font-size: 1.2em;
+        }
+
+        /* HAZIR KOLİLER */
+        .presets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .preset-btn {
+            background: #1a1a1a;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.1s;
+        }
+
+        .preset-btn:active {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: scale(0.93);
+        }
+
+        .preset-btn .dims {
+            font-size: 0.8em;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .preset-btn .lbl {
+            font-size: 0.55em;
+            color: #777;
+            margin-top: 2px;
+        }
+
+        /* INPUTLAR */
+        .field-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+            align-items: center;
+        }
+
+        .field-row label {
+            color: #888;
+            font-size: 0.65em;
+            font-weight: 600;
+            width: 22px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .input-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: #1a1a1a;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .input-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 10px 12px;
+            color: #fff;
+            font-size: 0.95em;
+            outline: none;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .input-box .unit {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.65em;
+            padding-right: 10px;
+        }
+
+        .num-row {
+            display: flex;
+            gap: 3px;
+            flex-wrap: wrap;
+        }
+
+        .num-btn {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            color: #999;
+            padding: 5px 7px;
+            border-radius: 5px;
+            font-size: 0.6em;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            min-width: 26px;
+            transition: all 0.1s;
+        }
+
+        .num-btn:active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            transform: scale(0.9);
+        }
+
+        /* SONUÇ */
+        .result {
+            margin-top: 12px;
+            background: #1a1a1a;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(255,92,0,0.15);
+        }
+
+        .desi-num {
+            font-size: 2.8em;
+            font-weight: 900;
+            color: var(--accent);
+            line-height: 1;
+        }
+
+        .desi-sub {
+            color: #777;
+            font-size: 0.65em;
+            letter-spacing: 1px;
+            margin-top: 3px;
+        }
+
+        /* BUTONLAR */
+        .actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.75em;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-calc {
+            background: var(--accent);
+            color: #fff;
+            flex: 2;
+        }
+
+        .btn-reset {
+            background: #1a1a1a;
+            color: #999;
+            border: 1px solid var(--border);
+        }
+
+        /* İMZA */
+        .signature {
+            text-align: center;
+            margin-top: 15px;
+            padding-top: 12px;
+            border-top: 1px solid #1a1a1a;
+        }
+
+        .sig-name {
+            font-family: 'Dancing Script', 'Great Vibes', cursive;
+            font-size: 1.3em;
+            color: #ff5c00;
+            text-shadow: 0 0 8px rgba(255,92,0,0.2);
+            letter-spacing: 1px;
+            opacity: 0.85;
+        }
+
+        .sig-sub {
+            font-family: 'Dancing Script', 'Great Vibes', cursive;
+            font-size: 0.7em;
+            color: #555;
+            letter-spacing: 1px;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600;700&family=Great+Vibes&display=swap');
+
+        @media (max-width: 350px) {
+            .preset-btn .dims {
+                font-size: 0.7em;
+            }
+            .desi-num {
+                font-size: 2.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">ARAS KARGO DESİ</div>
+        </div>
+
+        <!-- MİKROFON -->
+        <div class="mic-bar" id="micBar" onclick="toggleMic()">
+            <span class="mic-dot" id="micDot"></span>
+            <span class="mic-icon">🎤</span>
+            <span class="mic-text" id="micText">Dinlemek için dokun</span>
+        </div>
+
+        <!-- HAZIR KOLİ -->
+        <div class="presets">
+            <div class="preset-btn" onclick="quickCalc(15,25,35)"><div class="dims">15×25×35</div><div class="lbl">Mini</div></div>
+            <div class="preset-btn" onclick="quickCalc(20,30,40)"><div class="dims">20×30×40</div><div class="lbl">Küçük</div></div>
+            <div class="preset-btn" onclick="quickCalc(30,40,50)"><div class="dims">30×40×50</div><div class="lbl">Orta</div></div>
+            <div class="preset-btn" onclick="quickCalc(40,50,60)"><div class="dims">40×50×60</div><div class="lbl">Büyük</div></div>
+            <div class="preset-btn" onclick="quickCalc(50,60,70)"><div class="dims">50×60×70</div><div class="lbl">XL</div></div>
+            <div class="preset-btn" onclick="quickCalc(60,60,60)"><div class="dims">60×60×60</div><div class="lbl">Küp</div></div>
+        </div>
+
+        <!-- EN -->
+        <div class="field-row">
+            <label>En</label>
+            <div class="input-box">
+                <input type="number" id="en" placeholder="cm" step="0.1" min="0" inputmode="decimal">
+                <span class="unit">cm</span>
+            </div>
+        </div>
+        <div class="num-row">
+            <span class="num-btn" onclick="setVal('en',10)">10</span>
+            <span class="num-btn" onclick="setVal('en',15)">15</span>
+            <span class="num-btn" onclick="setVal('en',20)">20</span>
+            <span class="num-btn" onclick="setVal('en',25)">25</span>
+            <span class="num-btn" onclick="setVal('en',30)">30</span>
+            <span class="num-btn" onclick="setVal('en',40)">40</span>
+            <span class="num-btn" onclick="setVal('en',50)">50</span>
+            <span class="num-btn" onclick="setVal('en',60)">60</span>
+        </div>
+
+        <!-- BOY -->
+        <div class="field-row" style="margin-top:8px;">
+            <label>Boy</label>
+            <div class="input-box">
+                <input type="number" id="boy" placeholder="cm" step="0.1" min="0" inputmode="decimal">
+                <span class="unit">cm</span>
+            </div>
+        </div>
+        <div class="num-row">
+            <span class="num-btn" onclick="setVal('boy',10)">10</span>
+            <span class="num-btn" onclick="setVal('boy',15)">15</span>
+            <span class="num-btn" onclick="setVal('boy',20)">20</span>
+            <span class="num-btn" onclick="setVal('boy',25)">25</span>
+            <span class="num-btn" onclick="setVal('boy',30)">30</span>
+            <span class="num-btn" onclick="setVal('boy',40)">40</span>
+            <span class="num-btn" onclick="setVal('boy',50)">50</span>
+            <span class="num-btn" onclick="setVal('boy',60)">60</span>
+        </div>
+
+        <!-- YÜKSEKLİK -->
+        <div class="field-row" style="margin-top:8px;">
+            <label>Yük</label>
+            <div class="input-box">
+                <input type="number" id="yukseklik" placeholder="cm" step="0.1" min="0" inputmode="decimal">
+                <span class="unit">cm</span>
+            </div>
+        </div>
+        <div class="num-row">
+            <span class="num-btn" onclick="setVal('yukseklik',10)">10</span>
+            <span class="num-btn" onclick="setVal('yukseklik',15)">15</span>
+            <span class="num-btn" onclick="setVal('yukseklik',20)">20</span>
+            <span class="num-btn" onclick="setVal('yukseklik',25)">25</span>
+            <span class="num-btn" onclick="setVal('yukseklik',30)">30</span>
+            <span class="num-btn" onclick="setVal('yukseklik',40)">40</span>
+            <span class="num-btn" onclick="setVal('yukseklik',50)">50</span>
+            <span class="num-btn" onclick="setVal('yukseklik',60)">60</span>
+        </div>
+
+        <!-- SONUÇ -->
+        <div class="result" id="resultBox">
+            <div class="desi-sub">DESİ DEĞERİ</div>
+            <div class="desi-num" id="desiVal">0</div>
+            <div class="desi-sub" id="formula"></div>
+        </div>
+
+        <!-- BUTONLAR -->
+        <div class="actions">
+            <button class="btn btn-calc" onclick="calc()">⚡ HESAPLA</button>
+            <button class="btn btn-reset" onclick="rst()">SIFIRLA</button>
+        </div>
+
+        <!-- İMZA -->
+        <div class="signature">
+            <div class="sig-name">By Desing Gökhan Bilga</div>
+            <div class="sig-sub">design & development</div>
+        </div>
+    </div>
+
+    <script>
+        // ========== MİKROFON ==========
+        let rec = null;
+        let micOn = false;
+        let micErr = false;
+
+        function toggleMic() {
+            if (micErr) {
+                micErr = false;
+                startMic();
+                return;
+            }
+            micOn ? stopMic() : startMic();
+        }
+
+        function startMic() {
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SR) {
+                updateMic('error', '⚠️ Desteklenmiyor');
+                return;
+            }
+
+            rec = new SR();
+            rec.lang = 'tr-TR';
+            rec.continuous = true;
+            rec.interimResults = false;
+
+            rec.onresult = e => {
+                const t = e.results[e.results.length-1][0].transcript.toLowerCase();
+                const nums = t.match(/\d+/g);
+                if (nums && nums.length >= 3) {
+                    document.getElementById('en').value = nums[0];
+                    document.getElementById('boy').value = nums[1];
+                    document.getElementById('yukseklik').value = nums[2];
+                    calc();
+                    updateMic('active', '✅ Hesaplandı! Tekrar söyleyin');
+                } else if (nums && nums.length === 1) {
+                    if (!document.getElementById('en').value) setVal('en', nums[0]);
+                    else if (!document.getElementById('boy').value) setVal('boy', nums[0]);
+                    else if (!document.getElementById('yukseklik').value) setVal('yukseklik', nums[0]);
+                    else { document.getElementById('en').value = nums[0]; document.getElementById('boy').value = ''; document.getElementById('yukseklik').value = ''; }
+                    autoCalc();
+                }
+            };
+
+            rec.onerror = e => {
+                if (e.error === 'not-allowed') {
+                    micErr = true;
+                    stopMic();
+                    updateMic('error', '🔴 İzin reddedildi');
+                }
+            };
+
+            rec.onend = () => {
+                if (micOn && !micErr) setTimeout(() => { if (micOn) try { rec.start(); } catch(e) {} }, 200);
+            };
+
+            try {
+                rec.start();
+                micOn = true;
+                micErr = false;
+                updateMic('active', '🟢 Dinliyor... "20 30 40" deyin');
+            } catch(e) {
+                updateMic('error', '⚠️ Başlatılamadı');
+            }
+        }
+
+        function stopMic() {
+            micOn = false;
+            try { rec.stop(); } catch(e) {}
+            updateMic('', 'Dinlemek için dokun');
+        }
+
+        function updateMic(s, t) {
+            const bar = document.getElementById('micBar');
+            const dot = document.getElementById('micDot');
+            const txt = document.getElementById('micText');
+            bar.className = 'mic-bar';
+            if (s === 'active') { bar.classList.add('active'); dot.style.background = '#00c853'; }
+            else if (s === 'error') { bar.classList.add('error'); dot.style.background = '#ff1744'; }
+            else { dot.style.background = '#444'; }
+            txt.textContent = t;
+        }
+
+        // ========== HESAPLAMA ==========
+        function quickCalc(en, boy, yuk) {
+            document.getElementById('en').value = en;
+            document.getElementById('boy').value = boy;
+            document.getElementById('yukseklik').value = yuk;
+            calc();
+            if (navigator.vibrate) navigator.vibrate(8);
+        }
+
+        function setVal(id, val) {
+            document.getElementById(id).value = val;
+            autoCalc();
+            if (navigator.vibrate) navigator.vibrate(5);
+        }
+
+        function autoCalc() {
+            const e = +document.getElementById('en').value;
+            const b = +document.getElementById('boy').value;
+            const y = +document.getElementById('yukseklik').value;
+            if (e > 0 && b > 0 && y > 0) calc();
+        }
+
+        function calc() {
+            const e = +document.getElementById('en').value;
+            const b = +document.getElementById('boy').value;
+            const y = +document.getElementById('yukseklik').value;
+
+            if (!e || !b || !y || e <= 0 || b <= 0 || y <= 0) return;
+
+            const d = (e * b * y) / 3000;
+            const r = Math.round(d * 100) / 100;
+
+            const box = document.getElementById('resultBox');
+            document.getElementById('desiVal').textContent = r.toFixed(2);
+            document.getElementById('formula').textContent = `${e} × ${b} × ${y} ÷ 3000`;
+            box.classList.add('show');
+
+            // Sesli oku
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(r.toFixed(2) + ' desi');
+                u.lang = 'tr-TR';
+                u.rate = 1.4;
+                u.volume = 1;
+                window.speechSynthesis.speak(u);
+            }
+        }
+
+        function rst() {
+            document.getElementById('en').value = '';
+            document.getElementById('boy').value = '';
+            document.getElementById('yukseklik').value = '';
+            document.getElementById('resultBox').classList.remove('show');
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            document.getElementById('en').focus();
+        }
+
+        // ========== OTOMATİK ==========
+        document.querySelectorAll('input').forEach(i => {
+            i.addEventListener('input', autoCalc);
+            i.addEventListener('focus', function() { this.select(); });
+        });
+
+        window.addEventListener('load', () => {
+            document.getElementById('en').focus();
+        });
+
+        console.log('✅ Aras Kargo Desi | Gökhan Bilga');
+        console.log('📱 Ana Ekrana Ekleyerek uygulama gibi kullanın');
+    </script>
+</body>
+</html>
