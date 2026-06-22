@@ -1,0 +1,17 @@
+{
+  "name": "Aras Desi",
+  "short_name": "Aras Desi",
+  "description": "Aras Kargo Desi Hesaplama - Gökhan Bilga",
+  "start_url": "/Aras-desi/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#ff5c00",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    }
+  ]
+}
